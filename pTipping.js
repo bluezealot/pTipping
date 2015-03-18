@@ -1,18 +1,27 @@
 (function($){
+    var randomId = function(){
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+
     var pTipIn = function(e){
         var text = $(e.currentTarget).data('title');
         if(text && !$(e.currentTarget).prop('readOnly')){
-            var pos = $(e.currentTarget).position();
-            pos.left += $(e.currentTarget)[0].offsetWidth + 10;
+            var tgt = $(e.currentTarget),
+                pos = tgt.position();
+            pos.left += tgt[0].offsetWidth + 10;
 
-            var tip = '<div class="ptip" style="top:' + pos.top +'px;left:' + pos.left + 'px;display:none;" data-target="' + $(e.currentTarget).attr('id') + '">' + text + '</div>';
+            if(!tgt.attr('pTip-id')){
+                tgt.attr('pTip-id', randomId());
+            }
+
+            var tip = '<div class="ptip" style="top:' + pos.top +'px;left:' + pos.left + 'px;display:none;font-size:' + tgt.css('font-size') + ';" data-target="' + tgt.attr('pTip-id') + '">' + text + '</div>';
             $('body').append(tip);
             $('.ptip').fadeIn(300);
         }
     };
 
     var pTipOut = function(e){
-        var id = $(e.currentTarget).attr('id');
+        var id = $(e.currentTarget).attr('pTip-id');
         $('div[data-target="' + id + '"]').remove();
     };
 
