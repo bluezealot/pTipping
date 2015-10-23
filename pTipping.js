@@ -4,9 +4,10 @@
     };
 
     var pTipIn = function(e){
-        var text = $(e.currentTarget).data('title');
-        if(text && !$(e.currentTarget).prop('readOnly')){
-            var tgt = $(e.currentTarget),
+        var cTarget = $(e.currentTarget),
+            text = cTarget.data('h-tip') || cTarget.data('f-tip');
+        if(text && !cTarget.prop('readOnly')){
+            var tgt = cTarget,
                 pos = tgt.position();
             pos.left += tgt[0].offsetWidth + 10;
 
@@ -14,7 +15,11 @@
                 tgt.attr('pTip-id', randomId());
             }
 
-            var tip = '<div class="ptip" style="top:' + pos.top +'px;left:' + pos.left + 'px;display:none;font-size:' + tgt.css('font-size') + ';" data-target="' + tgt.attr('pTip-id') + '">' + text + '</div>';
+            var tip = '<div class="ptip" style="top:' + pos.top
+                + 'px;left:' + pos.left
+                + 'px;display:none;font-size:' + tgt.css('font-size')
+                + ';" data-target="' + tgt.attr('pTip-id')
+                + '">' + text + '</div>';
             $('body').append(tip);
             $('.ptip').fadeIn(300);
         }
@@ -25,27 +30,31 @@
         $('div[data-target="' + id + '"]').remove();
     };
 
+    var getType = function(ele){
+        var field;
+
+        if (ele.data('h-tip')) {
+            field = 'hover';
+        }else if (ele.data('f-tip')) {
+            field = 'focus';
+        }
+        return field;
+    };
+
     $.fn.pTip = function(){
-        return this.each(function(k, o){
-            var o = $(o),
-                actions = $(o).data('actions');
-            if(!actions || actions.length <= 0){
-                actions = ['hover'];
-            }
-            for(var i = 0; i < actions.length; i++){
-                switch(actions[i]){
-                    case 'hover':
-                        console.log('Applying hover', o);
-                        o.hover(pTipIn, pTipOut);
-                        break;
-                    case 'focus':
-                        console.log('Applying focus', o);
-                        o.focus(pTipIn);
-                        o.blur(pTipOut);
-                        break;
-                    default:
-                        break;
-                }
+        return this.each(function(k, v){
+            var o = $(v),
+                action = getType(o);
+            switch(action){
+                case 'hover':
+                    o.hover(pTipIn, pTipOut);
+                    break;
+                case 'focus':
+                    o.focus(pTipIn);
+                    o.blur(pTipOut);
+                    break;
+                default:
+                    break;
             }
         });
     };
